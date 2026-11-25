@@ -6,4 +6,9 @@ export const mixer = {
   save:body=>request('/feedback/save',body), findings:()=>request('/feedback'),
   isolate:body=>request('/patch/isolate',body), probe:(code,body)=>request('/patch/'+code+'/probe',body),
   restore:(code,body)=>request('/patch/'+code+'/restore',body),
+  muteTrials:()=>request('/feedback/mute-trials'),
+  muteTrial:code=>request('/feedback/mute-trials/'+encodeURIComponent(code)),
+  muteStart:body=>request('/feedback/mute-trials',body),
+  muteSegment:(code,body)=>request('/feedback/mute-trials/'+encodeURIComponent(code)+'/segments',body),
+  muteJudge:code=>request('/feedback/mute-trials/'+encodeURIComponent(code)+'/judge',{}),
 };

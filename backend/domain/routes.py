@@ -3,11 +3,12 @@ from core.auth import actor,allow
 from core.roles import REVIEW,WRITE
 from domain import catalog,channel,diagnose,soundcheck
 from domain.forms import Capture,Diagnose,Isolate,RelineProbe,Restore,SaveFinding
+from domain.mute_routes import mute_api
 
 patch=APIRouter(prefix="/patch")
 audio=APIRouter(prefix="/audio")
 feedback=APIRouter(prefix="/feedback")
-routers=(patch,audio,feedback)
+routers=(patch,audio,feedback,mute_api)
 
 
 @patch.get("")

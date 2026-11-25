@@ -1,4 +1,4 @@
-from sqlalchemy import CheckConstraint,Column,Float,ForeignKey,Integer,JSON,String,Table
+from sqlalchemy import CheckConstraint,Column,DateTime,Float,ForeignKey,Integer,JSON,String,Table
 from core.db import metadata
 
 findings = Table(
@@ -28,4 +28,26 @@ tickets = Table(
     Column("restored_by",String(80)),
     CheckConstraint("old_channel <> new_channel"),
     CheckConstraint("state IN ('isolated','restored')"),
+)
+
+mute_trials = Table(
+    "mute_trials",metadata,
+    Column("code",String(24),primary_key=True),
+    Column("point",String(20),ForeignKey("microphone_points.code"),nullable=False),
+    Column("channel",String(12),nullable=False),
+    Column("revision",Integer,nullable=False),
+    Column("control_point",String(20),ForeignKey("microphone_points.code")),
+    Column("status",String(16),nullable=False,default="active"),
+    # 在试时等于 channel，终局/作废置 NULL；唯一索引保证同一路并发开试只留一场
+    Column("active_slot",String(12),unique=True),
+    Column("wiring",JSON,nullable=False),
+    Column("segments",JSON,nullable=False),
+    Column("verdict",String(24)),
+    Column("reason",String(200)),
+    Column("verdict_checks",JSON),
+    Column("started_by",String(80),nullable=False),
+    Column("judged_by",String(80)),
+    Column("created_at",DateTime,nullable=False),
+    Column("judged_at",DateTime),
+    CheckConstraint("status IN ('active','source','inconclusive','void')"),
 )

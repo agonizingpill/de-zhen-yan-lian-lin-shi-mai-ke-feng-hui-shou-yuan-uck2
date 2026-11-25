@@ -50,4 +50,13 @@ docker compose exec -T backend python -m scripts.seed_demo
 
 `soundboard.py` 与 `interventions.py` 定义领域表。`soundcheck.py` 记录声检和配线版本，`diagnose.py` 固定快照并检查迟到的同频证据，`channel.py` 保护共享路、隔离独立点并复位。前端位于 `frontend/src/pages/`。状态枚举在 `backend/domain/states.py` 与 `frontend/src/audio-state.js`，权限枚举在 `backend/core/roles.py`、`frontend/src/store.js`，使用于数据库约束、强制业务路径和显示。
 
+## 短时静音试验
+
+几支麦同时啸叫、同频峰分不出由谁带起时，诊断页（邻域诊断）可选择一支麦发起短时静音试验（`mute_trials` 表，逻辑在 `backend/domain/muting.py`，接口挂在 `/feedback/mute-trials`）。试验按 **开麦 → 静音 → 重新开麦** 顺序录入三段读数，每段都带同路对照麦声级；对照麦缺省自动取同总线另一支麦，也可显式指定。
+
+- 同一路（`channel`）只允许一场进行中的试验：线路串行锁加 `active_slot` 唯一约束，并发开试只有一场成功，其余返回 409；终局或作废后释放该路。
+- 开试时快照该路接线（各麦位 `code/revision/patch`）。判定前接线发生任何变更，访问或补录时试验自动置为 `void`（作废），不再判定。
+- 三段齐了才判定：受试麦啸叫读数在静音段明显回落、重新开麦后回升至开麦段的一定比例，且对照麦三段声级极差平稳，才判 `source`（啸叫源头）；任一不满足记 `inconclusive`（证据不足）并给出未通过的检查项。读数按 0–1 归一化填写，百分数量级也可识别。
+- 诊断页可展开每场试验查看三段读数、判定与逐项检查；作业员/复核员可操作，只读访客可查询。
+
 源码以 MIT 许可提供，见 `LICENSE`。

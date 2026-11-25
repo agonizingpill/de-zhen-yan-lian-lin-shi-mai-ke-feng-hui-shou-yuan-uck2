@@ -4,6 +4,7 @@ import {desk} from '../audio-state.js';
 import {choices,field,run,write} from '../audio-form.js';
 import {status,titleBlock} from '../widgets.js';
 import {diagnosis,metrics} from '../components/samples.js';
+import {muteLab} from '../components/mute-lab.js';
 
 export async function findings(root,role) {
   const edit=el('section',{class:'action'});
@@ -35,6 +36,7 @@ export async function findings(root,role) {
     }));
   }
   root.replaceChildren(titleBlock('安澜 · 邻域诊断','回授源与同频证据','异常先核对同一时间窗的主峰。已有多个麦位同频协作时保留整条线路。'),
+    muteLab(role),
     el('div',{class:'mix invert'},edit,box));
   await load();
 }
